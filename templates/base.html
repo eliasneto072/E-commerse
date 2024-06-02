@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .produto-img {
+            max-width: 200px; /* Defina o tamanho máximo desejado */
+            height: auto;
+        }
+    
+        /* Adiciona margem superior para o input number */
+        .quantidade-input {
+            margin-top: 10px;
+            margin-bottom: 10px; /* Adiciona margem inferior de 10px */
+            width: 80px; /* Aumenta o width para 80px */
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <div class="text-right mb-3">
+            <a href="{% url 'clienteForms' %}" class="btn btn-primary">Ser Cliente</a>
+            <a href="{% url "relatorio" %}" class="btn btn-primary">Relatorio</a>
+        </div>
+        <h1 class="text-center mb-4">Nossos Produtos</h1>
+        {% for produto in produtos %}
+        <div class="card mb-3">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img src="{{produto.img.url}}" class="card-img produto-img" alt="Produto">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{produto.nome}}</h5>
+                        <p class="card-text">Preço: R${{produto.preco}}</p>
+                        <p class="card-text">Estoque: {{produto.qtd}} unidades</p>
+                        <form action="{% url 'comprar' produto.nome %}" method="post" class="d-inline" id="form-comprar-{{ produto.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="produto_id" value="{{ produto.id }}">
+                            <button type="submit" class="btn btn-primary ml-2">Comprar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
