@@ -1,46 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório de Vendas</title>
-    <!-- Inclua o link para o arquivo CSS do Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .table-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .table-container table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        .table-container th,
+        .table-container td {
+            padding: 15px;
+            vertical-align: middle;
+            background-color: #fff;
+            border-top: none;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .table-container th {
+            background-color: #343a40;
+            color: #fff;
+            border-bottom-color: #fff;
+            border-top: 1px solid #dee2e6;
+            border-radius: 10px 10px 0 0;
+        }
+        .table-container tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .pagination {
+            justify-content: flex-start;
+            margin-top: 20px;
+            margin-left: 15px;
+        }
+        .pagination a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 6px 10px;
+            border: 1px solid transparent;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .pagination .current {
+            font-weight: bold;
+            color: #333;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <h2 class="text-center">Relatório de Vendas</h2>
-                <table class="table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">Vendedor</th>
-                            <th scope="col">Produto</th>
-                            <th scope="col">Preço do Produto</th>
-                            <th scope="col">Data da Compra</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Loop sobre as compras -->
-                        {% for i in compras %}
-                        <tr>
-                            <td>{{ i.vendedor.nome }}</td>
-                            <td>{{ i.produto.nome }}</td>
-                            <td>R$ {{ i.produto.preco }}</td>
-                            <td>{{ i.data_compra }}</td>
-                            <!-- Calcular e exibir o imposto sobre as vendas para cada compra -->
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <form method="get" class="form-inline">
+                        {{ filter.form.as_p }}
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                    </form>
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Vendedor</th>
+                                <th scope="col">Produto</th>
+                                <th scope="col">Preço do Produto</th>
+                                <th>Cliente<th>
+                                <th scope="col">Data da Compra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop sobre as compras -->
+                            {% for i in page_obj %}
+                            <tr>
+                                <td>{{ i.vendedor.nome }}</td>
+                                <td>{{ i.produto.nome }}</td>
+                                <td>R$ {{ i.produto.preco }}</td>
+                                <td> {{ i.cliente.nome}} <td>
+                                <td>{{ i.data_compra }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="{% url "relatorio" %}?page={{page_obj.previous_page_number}}" class="btn btn-outline-primary">&laquo; Anterior</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="{% url "relatorio" %}?page={{page_obj.next_page_number}}" class="btn btn-outline-primary">Próximo &raquo;</a>
+                    {% endif %}
+                </div>
                 <div class="text-center">
                     <h4>Total de Imposto: R$ {{ total_imposto }}</h4>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Inclua os scripts JavaScript do Bootstrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

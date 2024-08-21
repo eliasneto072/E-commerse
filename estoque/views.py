@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Produto, Vendedor, Cliente, Compra
 from .forms import CompraForm, ClienteForm, VendedorForm, ProdutoForm
+from .filters import CompraFilter
+
+from django.core.paginator import Paginator
 
 from decimal import Decimal
 
@@ -67,11 +70,16 @@ def comprar(request, nome):
 
 def relatorio(request):
     compras = Compra.objects.all().order_by('-data_compra')
-    total_imposto = Decimal(0)
+    compras_filtro = CompraFilter(request.GET, queryset=compras)  # Passando o queryset não filtrado
+    
+    paginator = Paginator(compras_filtro.qs, 6)  # Usando o queryset filtrado para a paginação
+    page = request.GET.get('page')
+    page_obj = paginator.get_page(page)
 
-    for compra in compras:
+    total_imposto = Decimal(0)
+    for compra in compras_filtro.qs:  # Usando o queryset filtrado para calcular o total de imposto
         imposto = compra.produto.preco * Decimal(0.25)
         total_imposto += imposto
 
-    context = {'compras': compras, 'total_imposto': total_imposto}
+    context = {'page_obj': page_obj, 'filter': compras_filtro, 'total_imposto': total_imposto}
     return render(request, 'relatorio.html', context)
